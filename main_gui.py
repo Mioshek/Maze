@@ -1,4 +1,7 @@
 import sys
+import numpy as np
+import random
+from threading import Thread
 #from imports
 from PyQt6.QtWidgets import (
     QApplication,
@@ -11,7 +14,10 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QMouseEvent, QKeyEvent
 from PyQt6.QtCore import Qt, QEvent
+from PyQt6 import QtCore
 from settings_window import settings, get_primary_screen_name, screens
+from logic import Backtracking
+from time import sleep
 
 fields = {0:"#832232",
         1: "#e1eff6",
@@ -27,18 +33,25 @@ class Color:
 
 
 c = Color()
-
 class MainMindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        
-        self.fields_x = settings["width"]
-        self.fields_y = settings["height"]
+        self.cols = settings["width"]
+        self.rows = settings["height"]
+        if self.cols % 2 == 0:
+            self.cols += 1
+        if self.rows % 2 == 0:
+            self.rows += 1
         self.left_mouse_button_toogle = False
         self.setWindowTitle("Maze")
-        self.buttons = [[Button(x,y,self) for x in range(self.fields_x)] for y in range(self.fields_y)]
+        self.buttons = np.empty([self.rows, self.cols], dtype=Button)
+        for row in range(self.rows):
+            for col in range(self.cols):
+                self.buttons[row, col] =  Button(row,col,self)
         self.setupButtons()
         
+    def focusOutEvent(self, e):
+        print(e)
         
     def mousePressEvent(self, e):
         if e.button() == Qt.MouseButton.LeftButton: pass
@@ -52,12 +65,18 @@ class MainMindow(QMainWindow):
                 self.left_mouse_button_toogle = False
     
     def keyPressEvent(self, e):
-        if e.key() == 16777220:
+        if e.key() == 16777220: #enter
             fields_size = len(fields)
             c.current_col_index +=1
             if c.current_col_index == fields_size:
                 c.current_col_index = 0
             c.bg_color = fields[c.current_col_index]
+        print(e.key())
+        if e.key() == 16777248: 
+            bc = Backtracking(self.rows, self.cols, self.buttons)
+            t1 = Thread(target=bc.createMaze)
+            t1.start()
+
             
     def eventFilter(self, obj, event):
         sender = obj
@@ -67,37 +86,40 @@ class MainMindow(QMainWindow):
         return super().eventFilter(obj, event)
             
     def setupButtons(self):
-        for x in range(self.fields_x):
-            for y in range(self.fields_y):
-                self.buttons[y][x].clicked.connect(self.buttons[y][x].button_clicked)
-                self.buttons[y][x].installEventFilter(self)
-
+        for c in range(self.cols):
+            for r in range(self.rows):
+                self.buttons[r,c].clicked.connect(self.buttons[r,c].button_clicked)
+                self.buttons[r][c].installEventFilter(self)
+                # self.buttons[r][c].
 
 
 class Button(QPushButton):
-    def __init__(self, posX, posY, parent):
+    def __init__(self, row, col, parent):
         super(Button, self).__init__(parent)
-        self.posX = posX
-        self.posY = posY
+        self.col = col
+        self.row = row
         self.parent = parent
-        self.setStyleSheet('QPushButton {background-color: #e1eff6}')
+        if settings["autogenerate"] == True: self.set_color_if_auto(self.row, self.col)
+        else: self.setStyleSheet('QPushButton {background-color: #e1eff6}')
         self.screen_name = get_primary_screen_name()
         self.button_size = 0
-        if parent.fields_x < parent.fields_y:
-            self.button_size = (screens[self.screen_name]["height"] -20)/parent.fields_y
+        if parent.cols < parent.rows:
+            self.button_size = (screens[self.screen_name]["height"] -100)/parent.rows
         else:  
-            self.button_size = (screens[self.screen_name]["width"] -60)/parent.fields_x
-            temp_check_but_size = (screens[self.screen_name]["height"] -20)/parent.fields_y
+            self.button_size = (screens[self.screen_name]["width"] -100)/parent.cols
+            temp_check_but_size = (screens[self.screen_name]["height"] -100)/parent.rows
             if self.button_size > temp_check_but_size:
                 self.button_size = temp_check_but_size
-        self.init(posX,posY,self.button_size)
+        self.setGeometry(col*self.button_size,row*self.button_size, self.button_size, self.button_size)
         
-    def init(self, x, y, s):
-        self.setGeometry(4+x*s,10+y*s, s, s)
         
     def button_clicked(self):
         self.setStyleSheet('QPushButton {background-color: ' + c.bg_color + '}')
 
+    def set_color_if_auto(self, row, col):
+        if row%2 == 0 or col%2 == 0: self.setStyleSheet('QPushButton {background-color: #832232}')
+        else: self.setStyleSheet('QPushButton {background-color: #e1eff6}')
+    
             
 def run_main_gui():
     app = QApplication(sys.argv)

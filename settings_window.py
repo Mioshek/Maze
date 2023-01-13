@@ -73,11 +73,12 @@ class SetSizeWidgets(QWidget):
  
         slider = QSlider(Qt.Orientation.Horizontal, self)
         slider.setGeometry(self.x/10,self.x/15, self.x/1.2, self.x/6)
-        slider.setMinimum(4)
+        slider.setMinimum(5)
         if self.name == "Width":
-            slider.setMaximum(200)
-        else: slider.setMaximum(100)
+            slider.setMaximum(199)
+        else: slider.setMaximum(99)
         slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        slider.setSingleStep(2)
         slider.setTickInterval(2)
         slider.valueChanged.connect(self.display)
            
