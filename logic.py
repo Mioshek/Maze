@@ -5,13 +5,14 @@ from time import sleep
 import threading
 import numpy as np
 import sys
+import astar_logic
 
 sys.setrecursionlimit(8000)
 
-{0:"#832232",
+{0:"#28262c",
         1: "#e1eff6",
-        2:"#8884ff",
-        3:"#f679e5",
+        2:"#19297C",
+        3:"#D72638",
         4:"#248232",
         5:"#ffba08",
         }
@@ -25,6 +26,8 @@ class Cell:
     VISITED = -1
     WALL = 0
     WALKABLE = 1
+    START = 2
+    END = 3
 
   
 class Backtracking:
@@ -49,7 +52,7 @@ class Backtracking:
         sx = random.choice(range(2, self.width -2, 2))
         sy = random.choice(range(2, self.height -2, 2))
 
-        self.generator(sx, sy, maze)
+        self.generator(sy, sx, maze)
 
         for row in range(1,self.height +1):
             for col in range(1,self.width +1):
@@ -57,23 +60,36 @@ class Backtracking:
                     maze[row, col] = Cell.WALKABLE
                     self.buttons[row-1][col-1].setStyleSheet('QPushButton {background-color: #e1eff6}')
     
-        start_x, start_y = self.generate_endpoints(maze)
-        end_x, end_y = self.generate_endpoints(maze)
+        start_y, start_x = self.generate_endpoints(maze)
+        end_y, end_x = self.generate_endpoints(maze)
         while start_x == end_x and start_y == end_y:
-            start_x, start_y = self.generate_endpoints(maze)
-            end_x, end_y = self.generate_endpoints(maze)
-        self.buttons[start_y][start_x].setStyleSheet('QPushButton {background-color: #8884ff}')
-        self.buttons[end_y][end_x].setStyleSheet('QPushButton {background-color: #f679e5}')
+            start_y, start_x = self.generate_endpoints(maze)
+            end_y, end_x = self.generate_endpoints(maze)
+            
+        self.buttons[start_y-1][start_x-1].setStyleSheet('QPushButton {background-color: #19297C}')
+        self.buttons[end_y-1][end_x-1].setStyleSheet('QPushButton {background-color: #D72638}')
+        maze[start_y,start_x] = Cell.START
+        maze[end_y,end_x] = Cell.END
+        astar_logic.PathPoint.set_goal(astar_logic.Point(end_y,end_x))
+        a = astar_logic.Astar((start_y,start_x),(end_y,end_x),maze, self.buttons)
+        last_point = a.find_path()
+
+        point:astar_logic.PathPoint = last_point
+        while point != None:
+            self.buttons[point.row-1,point.col-1].setStyleSheet('QPushButton {background-color: #5AFF15}')
+            point = point.origin
+            sleep(0.01)
+            
         
     def generate_endpoints(self, maze):
-        x = random.choice(range(0, self.width))
-        y = random.choice(range(0, self.height))
+        x = random.choice(range(1, self.width))
+        y = random.choice(range(1, self.height))
         while maze[y, x] == Cell.WALL:
-            x = random.choice(range(0, self.width))
-            y = random.choice(range(0, self.height)) 
-        return x, y
+            x = random.choice(range(1, self.width))
+            y = random.choice(range(1, self.height)) 
+        return y, x
     
-    def generator(self, curr_x, curr_y, grid):
+    def generator(self, curr_y, curr_x, grid):
         grid[curr_y, curr_x] = Cell.VISITED
         self.buttons[curr_y-1][curr_x-1].setStyleSheet('QPushButton {background-color: "#65a86f"}')
         
@@ -105,10 +121,10 @@ class Backtracking:
                     new_y = curr_y
                     my = curr_y
                     
-                sleep(0.005)
+                sleep(0.001)
                 if grid[new_y, new_x] != Cell.VISITED:
                     grid[my, mx] = Cell.VISITED
                     self.buttons[my-1][mx-1].setStyleSheet('QPushButton {background-color: "#65a86f"}')
 
-                    self.generator(new_x, new_y, grid)
+                    self.generator(new_y, new_x, grid)
                     

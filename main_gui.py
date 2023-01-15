@@ -19,10 +19,10 @@ from settings_window import settings, get_primary_screen_name, screens
 from logic import Backtracking
 from time import sleep
 
-fields = {0:"#832232",
+fields = {0:"#28262c",
         1: "#e1eff6",
-        2:"#8884ff",
-        3:"#f679e5",
+        2:"#19297C",
+        3:"#D72638",
         4:"#248232",
         5:"#ffba08",
         }
@@ -115,9 +115,10 @@ class Button(QPushButton):
         
     def button_clicked(self):
         self.setStyleSheet('QPushButton {background-color: ' + c.bg_color + '}')
+        print(self.row, self.col)
 
     def set_color_if_auto(self, row, col):
-        if row%2 == 0 or col%2 == 0: self.setStyleSheet('QPushButton {background-color: #832232}')
+        if row%2 == 0 or col%2 == 0: self.setStyleSheet('QPushButton {background-color: #28262c}')
         else: self.setStyleSheet('QPushButton {background-color: #e1eff6}')
     
             
