@@ -30,7 +30,7 @@ for m in get_monitors():
     
 def get_primary_screen_name() -> str:
     for screen_name in screens.keys():
-        if screens[screen_name]["is_primary"]:
+        if not screens[screen_name]["is_primary"]:
             return screen_name
 
 
@@ -38,14 +38,16 @@ class AutogenerateButton(QWidget):
     def __init__(self):
         super().__init__()
         self.primary_screen_name = get_primary_screen_name()
-        self.x = screens[self.primary_screen_name]["width"]/3
-        self.y = screens[self.primary_screen_name]["height"]/6
+        # self.x = screens[self.primary_screen_name]["width"]/3
+        # self.y = screens[self.primary_screen_name]["height"]/6
+        self.x = int(1920/3)
+        self.y = int(1080/6)
         self.resize(self.x, self.y)
         self.setWindowTitle("Set Autogenerate")
         self.button_is_checked = True
         
         self.button = QPushButton("True",self)
-        self.button.setGeometry(self.x/5,self.x/10, self.x/2, self.x/12)# <1>
+        self.button.setGeometry(int(self.x/5),int(self.x/10), int(self.x/2), int(self.x/12))# <1>
         self.button.setCheckable(True)
         self.button.released.connect(
             self.the_button_was_released
@@ -63,16 +65,18 @@ class SetSizeWidgets(QWidget):
         super().__init__()
         self.name = name
         self.primary_screen_name = get_primary_screen_name()
-        self.x = screens[self.primary_screen_name]["width"]/3
-        self.y = screens[self.primary_screen_name]["height"]/6
+        # self.x = screens[self.primary_screen_name]["width"]/3
+        # self.y = screens[self.primary_screen_name]["height"]/6
+        self.x = int(1920/3)
+        self.y = int(1080/6)
         self.resize(self.x, self.y)
         self.setWindowTitle("Set Maze {name}".format(name=self.name))
         
         self.label = QLabel(self)
-        self.label.move(self.x/2, self.y/3)
+        self.label.move(int(self.x/2), int(self.y/3))
  
         slider = QSlider(Qt.Orientation.Horizontal, self)
-        slider.setGeometry(self.x/10,self.x/15, self.x/1.2, self.x/6)
+        slider.setGeometry(int(self.x/10),int(self.x/15), int(self.x/1.2), int(self.x/6))
         slider.setMinimum(5)
         if self.name == "Width":
             slider.setMaximum(199)
@@ -97,8 +101,10 @@ class MainWindow(QMainWindow):
         self.app = app
         self.setWindowTitle("Set Maze Size")
         self.primary_screen_name = get_primary_screen_name()
-        self.x = screens[self.primary_screen_name]["width"]/3
-        self.y = screens[self.primary_screen_name]["height"]/6
+        self.x = int(1920/3)
+        self.y = int(1080/6)
+        # self.x = screens[self.primary_screen_name]["width"]/3
+        # self.y = screens[self.primary_screen_name]["height"]/6
         self.resize(self.x, self.y)
         
         tabs = QTabWidget()
@@ -121,11 +127,13 @@ class NextWindow(QWidget):
         self.app = app
         self.setWindowTitle("Submit")
         self.primary_screen_name = get_primary_screen_name()
-        self.x = screens[self.primary_screen_name]["width"]/3
-        self.y = screens[self.primary_screen_name]["height"]/6
+        # self.x = screens[self.primary_screen_name]["width"]/3
+        # self.y = screens[self.primary_screen_name]["height"]/6
+        self.x = int(1920/3)
+        self.y = int(1080/6)
         
         self.button = QPushButton("Submit",self)
-        self.button.setGeometry(self.x/5,self.x/10, self.x/2, self.x/12)#
+        self.button.setGeometry(int(self.x/5),int(self.x/10), int(self.x/2), int(self.x/12))#
         self.button.clicked.connect(self.exit)
         
     def exit(self):

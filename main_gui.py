@@ -104,10 +104,11 @@ class Button(QPushButton):
         self.screen_name = get_primary_screen_name()
         self.button_size = 0
         if parent.cols < parent.rows:
-            self.button_size = (screens[self.screen_name]["height"] -100)/parent.rows
+            # screens[self.screen_name]["height"]
+            self.button_size = int((1080 -100)/parent.rows)
         else:  
-            self.button_size = (screens[self.screen_name]["width"] -100)/parent.cols
-            temp_check_but_size = (screens[self.screen_name]["height"] -100)/parent.rows
+            self.button_size = int((1080 -100)/parent.cols)
+            temp_check_but_size = int((1080 -100)/parent.rows)
             if self.button_size > temp_check_but_size:
                 self.button_size = temp_check_but_size
         self.setGeometry(col*self.button_size,row*self.button_size, self.button_size, self.button_size)
