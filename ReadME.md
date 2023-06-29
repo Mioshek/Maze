@@ -5,7 +5,7 @@
   <li>pip install numpy</li>
   <li>pip install screeninfo</li>
 </ul>
-<p>Target resolution 1080p</p>
+<h1>Target resolution 1080p</h1>
 <h1>Todo's</h1>
 <ul>
   <li>Editable resolution</li>
